@@ -33,6 +33,9 @@ behind.
 
 ## Using it with Claude Code
 
+**[SETUP.md](SETUP.md) has the whole thing**: the read-only NetSuite role and its exact
+permissions, the integration record and access token, and how to run each report.
+
 This is built to be driven conversationally. Open the repo in Claude Code and ask for what you
 want — *refresh the hours*, *why is this client over budget*, *build the client PDF*. The skill
 in `.claude/skills/hours-console/` carries the SuiteQL for each file, the field map, and the
