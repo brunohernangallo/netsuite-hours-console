@@ -1,0 +1,78 @@
+[
+ {
+  "job_id": 90001,
+  "job_name": "Northwind Foods | SOW1 | Implementation",
+  "jobtype": "1",
+  "planned": 540,
+  "consumed": 571.25,
+  "nb_planned": 0,
+  "nb_actual": 9.5,
+  "approved": 571,
+  "startdate": "02/13/2025",
+  "enddate": null,
+  "renewal_date": null,
+  "auto_renew": "F",
+  "rollover_cap": null,
+  "cos": [
+   {
+    "tranid": "3427",
+    "id": 800002,
+    "hrs": 120
+   }
+  ]
+ },
+ {
+  "job_id": 90002,
+  "job_name": "Northwind Foods | SOW2 | Managed Services",
+  "jobtype": "2",
+  "planned": 120,
+  "consumed": 74.5,
+  "nb_planned": 0,
+  "nb_actual": 3,
+  "approved": 74.5,
+  "startdate": "01/01/2026",
+  "enddate": "12/31/2026",
+  "renewal_date": "12/31/2026",
+  "auto_renew": "T",
+  "rollover_cap": 0,
+  "cos": []
+ },
+ {
+  "job_id": 90003,
+  "job_name": "Cascade Analytics | SOW1 | Optimization",
+  "jobtype": "1",
+  "planned": 300,
+  "consumed": 118.25,
+  "nb_planned": 0,
+  "nb_actual": 0,
+  "approved": 112,
+  "startdate": "05/06/2026",
+  "enddate": null,
+  "renewal_date": null,
+  "auto_renew": "F",
+  "rollover_cap": null,
+  "cos": []
+ },
+ {
+  "job_id": 90004,
+  "job_name": "Harbour Logistics | SOW3 | Implementation",
+  "jobtype": "1",
+  "planned": 880,
+  "consumed": 905.5,
+  "nb_planned": 0,
+  "nb_actual": 41.25,
+  "approved": 880,
+  "startdate": "09/03/2025",
+  "enddate": null,
+  "renewal_date": null,
+  "auto_renew": "F",
+  "rollover_cap": null,
+  "cos": [
+   {
+    "tranid": "4102",
+    "id": 800004,
+    "hrs": 880
+   }
+  ]
+ }
+]

@@ -1,0 +1,88 @@
+{
+ "_note": "SAMPLE DATA - invented, so the console runs before you connect anything. Replace it with your own NetSuite pull; the shape is what matters. See .claude/skills/hours-console/SKILL.md for the query behind each file.",
+ "jobs": {
+  "90001": [
+   [
+    "A. Rivera",
+    240.25,
+    "08/10/2026"
+   ],
+   [
+    "M. Okafor",
+    148.25,
+    "08/07/2026"
+   ],
+   [
+    "J. Lindqvist",
+    119.75,
+    "07/16/2026"
+   ],
+   [
+    "P. Shah",
+    62,
+    "08/01/2026"
+   ]
+  ],
+  "90002": [
+   [
+    "M. Okafor",
+    54.5,
+    "08/04/2026"
+   ],
+   [
+    "P. Shah",
+    20,
+    "06/18/2026"
+   ]
+  ],
+  "90003": [
+   [
+    "T. Nakamura",
+    71,
+    "08/11/2026"
+   ],
+   [
+    "A. Rivera",
+    34.75,
+    "08/05/2026"
+   ],
+   [
+    "P. Shah",
+    12.5,
+    "07/28/2026"
+   ]
+  ],
+  "90004": [
+   [
+    "J. Lindqvist",
+    330.5,
+    "07/29/2026"
+   ],
+   [
+    "T. Nakamura",
+    228,
+    "07/22/2026"
+   ],
+   [
+    "A. Rivera",
+    146,
+    "06/11/2026"
+   ],
+   [
+    "M. Okafor",
+    96,
+    "07/07/2026"
+   ],
+   [
+    "S. Beaulieu",
+    64.25,
+    "05/30/2026"
+   ],
+   [
+    "P. Shah",
+    41,
+    "07/02/2026"
+   ]
+  ]
+ }
+}

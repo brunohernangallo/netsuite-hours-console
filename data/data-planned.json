@@ -1,0 +1,30 @@
+{
+ "_note": "SAMPLE DATA - invented, so the console runs before you connect anything. Replace it with your own NetSuite pull; the shape is what matters. See .claude/skills/hours-console/SKILL.md for the query behind each file.",
+ "cols": [
+  "p",
+  "a",
+  "b"
+ ],
+ "jobs": {
+  "90001": [
+   560.85,
+   580.75,
+   612.4
+  ],
+  "90002": [
+   0,
+   77.5,
+   128.0
+  ],
+  "90003": [
+   312,
+   118.25,
+   331.2
+  ],
+  "90004": [
+   905,
+   946.75,
+   1024.0
+  ]
+ }
+}

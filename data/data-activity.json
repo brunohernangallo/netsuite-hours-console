@@ -1,0 +1,82 @@
+{
+ "_note": "SAMPLE DATA - invented, so the console runs before you connect anything. Replace it with your own NetSuite pull; the shape is what matters. See .claude/skills/hours-console/SKILL.md for the query behind each file.",
+ "jobs": {
+  "90001": {
+   "last": "08/10/2026",
+   "h30": 18.5,
+   "future": 0,
+   "ppl": 4,
+   "tasks": [
+    [
+     "03ERP.00 Build",
+     96.5,
+     "08/10/2026"
+    ],
+    [
+     "Admin / Weekly Calls",
+     22,
+     "08/07/2026"
+    ],
+    [
+     "Non-Billable",
+     9.5,
+     "06/30/2026"
+    ]
+   ]
+  },
+  "90002": {
+   "last": "08/04/2026",
+   "h30": 6,
+   "future": 0,
+   "ppl": 2,
+   "tasks": [
+    [
+     "2026-07 July",
+     6,
+     "08/04/2026"
+    ],
+    [
+     "Non-Billable",
+     3,
+     "05/12/2026"
+    ]
+   ]
+  },
+  "90003": {
+   "last": "08/11/2026",
+   "h30": 44.25,
+   "future": 0,
+   "ppl": 3,
+   "tasks": [
+    [
+     "04EPM Deploy & Transition",
+     71,
+     "08/11/2026"
+    ],
+    [
+     "CO1 Additional Reporting",
+     12.5,
+     "07/28/2026"
+    ]
+   ]
+  },
+  "90004": {
+   "last": "07/29/2026",
+   "h30": 0,
+   "future": 0,
+   "ppl": 6,
+   "tasks": [
+    [
+     "05.00 Deploy",
+     150.25,
+     "07/29/2026"
+    ],
+    [
+     "Non-Billable",
+     41.25,
+     "07/02/2026"
+    ]
+   ]
+  }
+ }
+}

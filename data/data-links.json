@@ -1,0 +1,47 @@
+{
+ "_note": "SAMPLE DATA - invented, so the console runs before you connect anything. Replace it with your own NetSuite pull; the shape is what matters. See .claude/skills/hours-console/SKILL.md for the query behind each file.",
+ "open": {
+  "90001": [
+   7001,
+   "https://drive.example.com/northwind-sow1.pdf"
+  ],
+  "90002": [
+   7002,
+   "https://drive.example.com/northwind-sow2.pdf"
+  ],
+  "90003": [
+   7003,
+   null
+  ],
+  "90004": [
+   7004,
+   "https://drive.example.com/harbour-sow3.pdf"
+  ]
+ },
+ "closed": [
+  {
+   "id": 89001,
+   "name": "Northwind Foods | SOW0 | Discovery",
+   "plan": 80,
+   "used": 76.5,
+   "st": 1,
+   "start": "06/02/2024",
+   "end": "09/30/2024",
+   "opp": 800000,
+   "rtm": 7000,
+   "link": null
+  },
+  {
+   "id": 89002,
+   "name": "Cascade Analytics | SOW0 | Assessment",
+   "plan": 40,
+   "used": 52,
+   "st": 28,
+   "start": "01/08/2026",
+   "end": "03/31/2026",
+   "opp": 800006,
+   "rtm": 7005,
+   "link": null
+  }
+ ]
+}
