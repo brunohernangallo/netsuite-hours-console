@@ -34,6 +34,10 @@ const rtmT = rd(path.join(DATA, "data-rtm.json")).jobs;
 const peopleT = rd(path.join(DATA, "data-people.json")).jobs;
 const billT = rd(path.join(DATA, "data-billable.json")).jobs;
 const invoicesByJob = rd(path.join(DATA, "data-invoices.json")).jobs;
+// The signed SOW as a PDF in the NetSuite file cabinet. There is no field joining a file to
+// a project, so these are matched by file name and each carries a confidence flag. A candidate
+// is shown with a question mark, never as "the contract". See the note in data-sowpdf.json.
+const sowPdf = rd(path.join(DATA, "data-sowpdf.json")).jobs;
 
 const n = (v) => (v == null ? null : Math.round(Number(v) * 100) / 100);
 const clientOf = (s) => String(s).split("|")[0].trim();
@@ -110,7 +114,7 @@ const rows = nsRows.map((r) => {
     start: r.startdate || null, end: r.enddate || null, renewal: r.renewal_date || null,
     autoRenew: r.auto_renew === "T", rollover: r.rollover_cap,
     sold, soldFrom, soldBad, soldNote: x.sold_source || null, opp: x.opp || null,
-    rtm: l[0] || null, sowLink: l[1] || null,
+    rtm: l[0] || null, sowLink: l[1] || null, pdf: sowPdf[id] || null,
     co, cos, coNote, plan, alloc: n(x.alloc), used, approved: n(r.approved),
     nbPlan: n(r.nb_planned), nbUsed: bl ? n(bl[1]) : n(r.nb_actual),
     usedPlanTask: n(r.consumed), usedFrom: bl ? 'timebill.isbillable' : 'projecttask.actualwork',
@@ -427,6 +431,8 @@ table.grid thead th .fld{color:var(--g-600);font-weight:500}
 .meta.txt{font-family:var(--font);font-style:italic;color:var(--g-700)}
 .lnk{display:inline-block;margin:5px 6px 0 0;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--g-600);text-decoration:none;border-bottom:1px dotted var(--g-400)}
 .lnk:hover{color:var(--green-700);border-color:var(--green-500)}
+/* A signed-SOW PDF matched by file name and not confirmed. It must not read like the contract. */
+.lnk.maybe{color:var(--amber-700,#8a6100);border-bottom-style:dashed;border-color:var(--amber-500,#d99e00)}
 .chip{display:inline-block;margin:5px 4px 0 0;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:600}
 .chip.over{background:rgba(201,81,46,.12);color:var(--danger)}
 .chip.low{background:rgba(242,204,95,.28);color:#8a6d10}
@@ -620,6 +626,10 @@ const JOB = i => 'https://<YOUR_ACCOUNT_ID>.app.netsuite.com/app/accounting/proj
 const INV = (t) => "https://<YOUR_ACCOUNT_ID>.app.netsuite.com/app/common/search/searchresults.nl?searchtype=Transaction&Transaction_NUMBERTEXT=" + encodeURIComponent(t) + "&Transaction_NUMBERTEXTtype=IS&style=NORMAL";
 const OPP = i => 'https://<YOUR_ACCOUNT_ID>.app.netsuite.com/app/accounting/transactions/opprtnty.nl?id=' + i;
 const RTM = i => 'https://<YOUR_ACCOUNT_ID>.app.netsuite.com/app/common/custom/custrecordentry.nl?rectype=1435&id=' + i;
+// The signed SOW straight out of the file cabinet. p = [fileId, fileName, confidence, hash,
+// note]. The hash is part of the media URL and NetSuite will not serve the file without it.
+const PDF = p => 'https://<YOUR_ACCOUNT_ID>.app.netsuite.com/core/media/media.nl?id=' + p[0] + '&c=<YOUR_ACCOUNT_ID>&h=' + p[3] + '&_xt=.pdf';
+const pdfTip = p => p[1] + (p[2] ? '' : '  --  MATCHED BY NAME, NOT CONFIRMED. ' + (p[4] || ''));
 const f = v => v == null ? '' : Number(v).toLocaleString('en-US',{maximumFractionDigits:2});
 const money = v => v == null ? '' : '$' + Number(v).toLocaleString('en-US',{maximumFractionDigits:0});
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -649,7 +659,10 @@ const refs = r => '<span class="refs noprint">References: ' +
   '<a class="lnk" href="' + JOB(r.id) + '" target="_blank" rel="noopener">NetSuite project</a>' +
   (r.opp ? '<a class="lnk" href="' + OPP(r.opp) + '" target="_blank" rel="noopener">Opportunity</a>' : '') +
   (r.rtm ? '<a class="lnk" href="' + RTM(r.rtm) + '" target="_blank" rel="noopener">RTM</a>' : '') +
-  (r.sowLink ? '<a class="lnk" href="' + r.sowLink + '" target="_blank" rel="noopener">Signed SOW</a>' : '') +
+  (r.pdf ? '<a class="lnk' + (r.pdf[2] ? '' : ' maybe') + '" href="' + PDF(r.pdf) +
+    '" target="_blank" rel="noopener" title="' + esc(pdfTip(r.pdf)) + '">Signed SOW (PDF)' +
+    (r.pdf[2] ? '' : ' ?') + '</a>' : '') +
+  (r.sowLink ? '<a class="lnk" href="' + r.sowLink + '" target="_blank" rel="noopener">SOW on Drive</a>' : '') +
   '</span>';
 
 function srow(r, showClient) {

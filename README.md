@@ -54,7 +54,10 @@ against. Map them to your own; the skill says what each one is for.
 ## Rules baked in
 
 - **Hours are never derived from money.** No `$ ÷ rate`, no deposits, no `% complete`.
-- **Non-billable is shown, never added** to Used, Remaining or any total.
+- **Only `timebill.timetype = 'A'` is real time.** `P` is planned time entries and `B` is
+  generated from the allocation; a query that does not filter is inflated.
+- **Non-billable is shown, never added** to Used, Remaining or any total. It comes from
+  `timebill.isbillable`, not from a task named Non-Billable.
 - **Actual means billable actual** — the same figure the project record calls Actual Billable Hrs.
 - **A change order counts only if it adds scope.** One that repeats the SOW's own line
   quantities is the contract restated, not an increment; counting it doubles the contract.
@@ -75,6 +78,21 @@ refreshes it. In the account this was built against, nothing did:
 
 So the console shows both, with the save date, inside each client. A gap there is not a data
 error; it is a snapshot waiting for someone to press **Store Values**.
+
+## Linking to the signed contract
+
+Each row ends in `ns · opp · rtm · pdf · sow`, and `pdf` opens the countersigned SOW straight
+out of the NetSuite file cabinet.
+
+Worth knowing before you try this in your own account: **NetSuite exposes no join from a
+document to a project.** `TransactionAttachment` and `mediaitem` both come back as "invalid
+search type" over SuiteQL, and a custom "SOW link" field usually holds a Drive URL rather than
+a file cabinet id. What *is* queryable is `file` and `mediaitemfolder` — so the match is made
+on the file name, and anything the name does not settle renders as an amber **`pdf?`** with
+its reason in the tooltip. A guess is never dressed up as the contract.
+
+Also expect the coverage to embarrass you. In the account this was built against, 26 of 63
+open SOWs had a findable countersigned PDF.
 
 ## Layout
 

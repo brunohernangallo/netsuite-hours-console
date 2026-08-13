@@ -44,6 +44,8 @@ Then the permissions. **Every one of these is View, never Edit or Full.**
 - Charge — *View* (this is what carries billed vs unbilled hours)
 - Custom Record Entries — *View*, plus the specific custom record if your account keeps a
   project/RTM record with stored totals
+- Documents and Files — *View* (only if you want the signed-SOW PDF links; without it the
+  `file` table returns nothing and the console simply omits the `pdf` link)
 
 **Permissions → Reports**
 - SuiteAnalytics Workbook — *Edit* (counter-intuitive: SuiteQL over REST needs Edit here, not
@@ -121,6 +123,9 @@ check before trusting the output:
   the account this was built against. Map them to yours; the skill says what each is for.
 - **Project status codes differ.** The build treats some statuses as open, some as "on hold or
   in review", and some as finished. Check `data-links.json` against your own list.
+- **Folder ids for the signed SOWs are yours.** `data-sowpdf.json` points at two file-cabinet
+  folders. Find your own with `SELECT id, name FROM mediaitemfolder`, and read the note at the
+  top of that file before trusting a match — the links are made on file names, not on a join.
 
 ---
 

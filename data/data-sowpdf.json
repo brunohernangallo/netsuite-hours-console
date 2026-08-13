@@ -1,0 +1,10 @@
+{
+  "_note": "The signed SOW as a PDF in the NetSuite file cabinet. NetSuite exposes NO join from a document to a project - the attachment tables are not queryable through SuiteQL, and a custom 'SOW link' entity field usually holds a Google Drive URL rather than a file cabinet id. So these are matched by FILE NAME against your contract folders. conf 1 = the file names the client and the SOW number and nothing else competes. conf 0 = a candidate the name did not settle; the console renders it as an amber 'pdf?' with the note in its tooltip, so nobody reads a guess as the contract. Jobs absent from this map simply get no pdf link. Sample data - the ids, hashes and folder numbers are invented.",
+  "folders": { "28348": "Statements of Work", "4362": "Signed Client Contracts" },
+  "cols": ["fileId", "fileName", "conf", "hash", "note"],
+  "jobs": {
+    "90001": [100001, "Northwind Foods - ACME - SOW1 - Implementation.pdf", 1, "SAMPLEHASHNORTHWIND1"],
+    "90002": [100002, "Northwind Foods - ACME - SOW2 - Managed Services.pdf", 1, "SAMPLEHASHNORTHWIND2"],
+    "90004": [100004, "Harbour Logistics MSA and SOW.pdf", 0, "SAMPLEHASHHARBOUR3", "The file carries no SOW number and Harbour Logistics has had three, so this may not be SOW3."]
+  }
+}

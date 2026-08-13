@@ -5,7 +5,7 @@ description: Refresh and publish the Hours Console — per-SOW sold/CO/plan/allo
 
 # Hours Console
 
-A single self-contained HTML page built from NetSuite. `node build.js` reads the five
+A single self-contained HTML page built from NetSuite. `node build.js` reads the eleven
 JSON files in `data/` and writes `dist/index.html`; `firebase deploy --only hosting`
 publishes it to the hours console.
 
@@ -19,10 +19,20 @@ Run them, write the JSON, then `node build.js`. Everything is keyed by **job id*
 
 ### Rules that the queries encode — do not "simplify" them
 
-1. **Root tasks only.** A project task list is a tree. Sum `plannedwork` / `actualwork`
-   where `parent IS NULL`, then subtract the topmost `NON-BILLABLE%` node. Summing every
-   level double counts; `estimatedwork` reads the whole tree and is wrong.
-2. **Non-billable is shown, never added.** It is not part of Used, Remaining or any total.
+0. **Filter `timebill.timetype`.** NetSuite keeps three kinds of time on the same record and
+   they must never be mixed: `A` is real logged time, `P` is planned time entries (what a PMO
+   EAC workbook calls Planned Hours), `B` is generated from the resource allocation.
+   **Any timebill query without `timetype = 'A'` is inflated.**
+1. **Root tasks only.** A project task list is a tree. Sum `plannedwork` where
+   `parent IS NULL`. Summing every level double counts; `estimatedwork` reads the whole tree
+   and is wrong.
+2. **Billable comes from the time entry, not from a task name.** `timebill.isbillable` is set
+   on every row, so it cannot drift. The tempting alternative — subtract a task called
+   `NON-BILLABLE%` — needs that task to exist *and* the plan to be current, and
+   `projecttask.actualwork` only moves once time is approved: in the field it came out 49.5
+   hrs light on one project and 4 hrs light on another. Non-billable is **shown, never
+   added**: not part of Used, Remaining or any total. It exists on roughly half of projects,
+   and on one it was 170 hours being silently counted as delivery.
 3. **A change order is only added when it adds scope.** Some COs are the whole contract
    restated: they repeat the SOW's own line quantities and its deposit line. Adding those
    invents hours the client never bought (seen in the field: a project published 1,056.7 contracted hours when the real figure was 509.85, and it was already over). When a CO repeats a SOW
@@ -87,6 +97,74 @@ people, and the top tasks of the last 60 days, from `timebill`.
 
 `custentity_bpc_rtmproject` and `custentity_bpc_sow_link`, plus the non-open SOWs with
 their status codes.
+
+### data/data-billable.json — `{jobId: [billable, nonbillable]}`
+
+The authoritative split, straight off the time record. This is where **Actual** comes from.
+
+```sql
+SELECT tb.customer AS j, tb.isbillable, SUM(tb.hours)
+FROM timebill tb
+WHERE tb.customer IN (<job ids>) AND tb.timetype = 'A'
+GROUP BY tb.customer, tb.isbillable
+```
+
+### data/data-planned.json — `{jobId: [p, a, b]}` by `timetype`
+
+The same query grouped by `tb.timetype` instead. Used to show *why* two forecasts of the same
+work disagree: `p` is what the PMO loaded as planned time entries, and it is a different
+number from `projecttask.plannedwork`, which is what a PM typed into the plan. Neither is
+wrong on its own. Where a project carries no planned time entries the comparison cannot be
+made, and the console says so instead of showing a zero.
+
+### data/data-rtm.json — what the project custom record has stored
+
+If your account keeps a project custom record with stored totals (allocated hours, actual
+hours, contract value) plus its `lastmodifieddate`, pull them.
+
+**Check whether anything refreshes those fields. In the account this was built against,
+nothing did:** one record last saved on the 31st had five time entries created over the next
+ten days and never moved; another sat at 391.5 stored hours while 149 approved hours
+accumulated, the live figure being exactly 391.5 + 149. So the console shows the stored figure
+beside the live one with its save date, and a gap reads as *waiting for a re-save*, not as a
+data error. Do not open a conversation with the PMO by calling their tool wrong — show both.
+
+### data/data-people.json — `{jobId: [[name, hours, lastEntry], ...]}`
+
+Who did the work, `timetype = 'A'` only, joined to `employee` for names. Over the MCP
+connector this returns instantly for **one** project and times out at **six** — chunk it.
+
+### data/data-sowpdf.json — the signed SOW PDF in the file cabinet
+
+`{jobId: [fileId, fileName, conf, hash, note]}`. The link is
+`/core/media/media.nl?id=<fileId>&c=<account>&h=<hash>&_xt=.pdf` — NetSuite will not serve
+the file without the hash, so pull `f.url` and keep it.
+
+```sql
+SELECT f.id, f.name, f.url FROM file f
+WHERE f.folder IN (<contract folder ids>) AND f.filetype = 'PDF'
+  AND (UPPER(f.name) LIKE '%<CLIENT>%' OR ...)
+```
+
+Find your folder ids in `mediaitemfolder`, which is queryable. Chunk about a dozen clients per
+query.
+
+**There is no field joining a document to a project.** `TransactionAttachment` and
+`mediaitem` are not exposed to SuiteQL ("invalid search type"), and a custom "SOW link" entity
+field usually holds a Google Drive URL rather than a file cabinet id. So the match is on the
+**file name** — `<Client> - <Firm> - SOW<n> - <scope>.pdf` — and every entry carries a
+confidence flag: `1` when the file names the client and the SOW number and nothing competes,
+`0` when it does not. A `0` renders as an amber **`pdf?`** with the reason in its tooltip and
+must never be quoted as the contract.
+
+Two traps worth knowing. Real file names are filthy: `_` for spaces, `(1) (2)` suffixes,
+`.docx.pdf`, two files for one SOW, some stored with no extension at all. And short `LIKE`
+fragments over-match — `%NGS%` hits "Holdi**ngs**", `%NVE%` hits "co**nve**x" and
+"i**nve**ntory". Read the result list before trusting it.
+
+Expect poor coverage. In the account this was built against, only 26 of 63 open SOWs had a
+findable countersigned PDF, which is itself a finding worth reporting rather than papering
+over.
 
 ## Who has worked past their allocation
 
