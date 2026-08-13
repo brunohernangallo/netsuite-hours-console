@@ -1,0 +1,25 @@
+{
+ "_note": "SAMPLE DATA. Billable vs non-billable actual hours per job from timebill.isbillable with timetype = 'A'. This is the authoritative split - do not infer it from a task named Non-Billable, which needs that task to exist and the plan to be current.",
+ "cols": [
+  "billable",
+  "nonbillable"
+ ],
+ "jobs": {
+  "90001": [
+   571.25,
+   9.5
+  ],
+  "90002": [
+   74.5,
+   3
+  ],
+  "90003": [
+   118.25,
+   0
+  ],
+  "90004": [
+   905.5,
+   41.25
+  ]
+ }
+}

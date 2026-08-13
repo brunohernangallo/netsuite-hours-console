@@ -32,6 +32,7 @@ const links = rd(path.join(DATA, "data-links.json"));
 const plannedT = rd(path.join(DATA, "data-planned.json")).jobs;
 const rtmT = rd(path.join(DATA, "data-rtm.json")).jobs;
 const peopleT = rd(path.join(DATA, "data-people.json")).jobs;
+const billT = rd(path.join(DATA, "data-billable.json")).jobs;
 const invoicesByJob = rd(path.join(DATA, "data-invoices.json")).jobs;
 
 const n = (v) => (v == null ? null : Math.round(Number(v) * 100) / 100);
@@ -45,6 +46,11 @@ const rows = nsRows.map((r) => {
   const pt = plannedT[id] || [0, 0, 0];
   const rt = rtmT[id] || [];
   const who = peopleT[id] || [];
+  // Billable vs non-billable comes from the time record itself, not from a task called
+  // "Non-Billable". The task-name rule needs that task to exist AND the plan to be current,
+  // and projecttask.actualwork only moves once time is approved - it was 41 hrs light on one
+  // project. timebill.isbillable is set on every entry, so it cannot drift.
+  const bl = billT[id];
   const cos = (Array.isArray(r.cos) ? r.cos : []).map((c) => ({ tranid: c.tranid, id: c.id, hrs: n(c.hrs) }));
   // A change order is only added when it really adds scope. Some COs are the whole contract
   // restated: they repeat the SOW's own line items and deposit, so summing them invents hours
@@ -60,7 +66,8 @@ const rows = nsRows.map((r) => {
   const coNote = x.co_source || (clones.length && x.co_manual == null
     ? clones.map((c) => c.tranid).join(', ') + ' repeats the SOW total of ' + n(soldRaw) + ' hrs line for line, so it restates the contract rather than adding to it, and is not counted.'
     : null);
-  const plan = n(r.planned) || 0, used = n(r.consumed) || 0;
+  const plan = n(r.planned) || 0;
+  const used = bl ? n(bl[0]) : (n(r.consumed) || 0);
 
   // --- sanity gate on the "sold" figure -------------------------------------------------
   // The primary opportunity is not always the SOW: on Example Client it points at a 5.6-hr
@@ -105,7 +112,8 @@ const rows = nsRows.map((r) => {
     sold, soldFrom, soldBad, soldNote: x.sold_source || null, opp: x.opp || null,
     rtm: l[0] || null, sowLink: l[1] || null,
     co, cos, coNote, plan, alloc: n(x.alloc), used, approved: n(r.approved),
-    nbPlan: n(r.nb_planned), nbUsed: n(r.nb_actual),
+    nbPlan: n(r.nb_planned), nbUsed: bl ? n(bl[1]) : n(r.nb_actual),
+    usedPlanTask: n(r.consumed), usedFrom: bl ? 'timebill.isbillable' : 'projecttask.actualwork',
     billed: n(b.billed), ready: n(b.ready), invoices: b.inv || 0, invAmt: n(b.amt),
     unpaid: n(b.unpaid), openInv: b.open || 0, lastInv: b.last || null,
     lastTime: a.last || null, h30: n(a.h30), future: a.future || 0, people: a.ppl || 0,
@@ -919,7 +927,7 @@ const BAND = {
 const NL = String.fromCharCode(10);
 const FLD = {
   planned:   ["projecttask.plannedwork", "The project plan on the root tasks - the same figure the RTM calls Planned Hours. Every SOW has one, which is why the sheet uses it. The PMO also loads planned time entries (timetype P); where the two disagree it is listed under Checks."],
-  actual:    ["projecttask.actualwork, billable only", "Real time logged against the project, billable only - the same figure the RTM calls Actual Billable Hrs. Non-billable time is in its own column and counts against nothing."],
+  actual:    ["timebill.hours where isbillable = T", "Billable time logged against the project, taken from the flag on each time entry rather than from a task named Non-Billable. That task does not exist on every project and the plan only updates once time is approved, so the flag is the one thing that cannot drift. Non-billable sits in its own column and counts against nothing."],
   leftest:   ["plannedwork - billable actual", "How much of our own estimate is left. Negative means the work took longer than we said. Internal: the client never agreed to this estimate, only to a scope and a total."],
   ofest:     ["billable actual / plannedwork", "How much of the estimate has been spent. Over 100% means past our own forecast, which is not the same as past the contract."],
   allocated: ["job.allocatedtime", "Everything the PM has staffed, running forward to the end of the plan. Equals the sum of resourceallocation.numberhours and is generated from the RTM. Above the contract it is an early warning, not an overrun."],
@@ -931,7 +939,7 @@ const FLD = {
   billed:    ["charge.stage = BILLED", "Time approved and already on an invoice."],
   unbilled:  ["charge.stage = READY_FOR_BILLING", "Time approved and waiting to be invoiced - delivered work not yet charged for."],
   unpaid:    ["transaction.foreignamountunpaid", "Invoiced and still outstanding. If one invoice spans two projects this is the whole invoice."],
-  nonbill:   ["Non-Billable project task", "Shown because it exists. It is not part of Used and it is in no total on this page."],
+  nonbill:   ["timebill.hours where isbillable = F", "Shown because it exists. It is not part of Used and it is in no total on this page."],
   sold:      ["opportunity item quantity", "Hours on the SOW opportunity, reached through custentity_bpc_primaryopportunity. Blank when the won opportunity carries no line items - NetSuite does not hold the figure, and it is never inferred from money."],
   co:        ["custbody_bpc_opp_original_sow", "Won change orders pointing at this project. Counted only when they add scope."],
   plan:      ["projecttask.plannedwork", "What a PM typed into the plan at kickoff. The number most other reports read, and the one that is wrong most often."],
